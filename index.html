@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BLK Metas de Materiais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #111315;
+  --surface: #171a1d;
+  --cell: #1f2327;
+  --cell-2: #272c31;
+  --line: #2d3339;
+  --fg: #e9ecec;
+  --muted: #98a2a9;
+  --accent: #7fcfbf;
+  --accent-ink: #0b1a17;
+  --brass: #d8a94e;
+  --danger: #ea7a70;
+  --discord: #5865f2;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.45;
+  padding-inline: 16px;
+  padding-block: 20px 56px;
+}
+img { max-width: 100%; }
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 18px; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3, p { margin: 0; }
+
+/* Cabeçalho */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.top h1 { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-family: var(--display); font-weight: 800; text-transform: uppercase; line-height: 1; }
+.top .org { font-size: 2.7rem; letter-spacing: 0.1em; }
+.top .app { font-size: 1.25rem; letter-spacing: 0.06em; font-weight: 700; color: var(--muted); padding-left: 12px; border-left: 2px solid var(--accent); }
+.top .sub { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+.who { display: flex; align-items: center; gap: 10px; min-width: 0; flex-wrap: wrap; }
+.who img { width: 30px; height: 30px; border-radius: 50%; background: var(--cell-2); }
+.who .nm { font-weight: 600; overflow-wrap: anywhere; }
+.chip { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.chip.lead { color: var(--brass); border-color: color-mix(in srgb, var(--brass) 50%, var(--line)); }
+.chip.wait { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 50%, var(--line)); }
+
+/* Telas */
+.center { display: grid; gap: 14px; justify-items: start; max-width: 520px; padding-block: 24px; }
+.center h2 { font-size: 1.7rem; }
+.loading { color: var(--muted); padding-block: 40px; }
+.btn.discord { background: var(--discord); color: #fff; padding: 12px 20px; font-size: 1rem; }
+
+/* Barra da semana */
+.weekbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.weekbar .nav { width: 36px; height: 36px; border-radius: 6px; border: 1px solid var(--line); background: var(--cell); display: grid; place-items: center; }
+.weekbar .nav:disabled { opacity: 0.35; cursor: default; }
+.weekbar .lbl { display: flex; flex-direction: column; min-width: 0; padding-inline: 4px; }
+.weekbar .rng { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: 0.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.weekbar .tag { font-size: 0.78rem; color: var(--muted); }
+.weekbar .left { margin-left: auto; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Abas */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 14px; color: var(--muted); font-weight: 600; white-space: nowrap; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+
+.notice { background: var(--cell); border: 1px solid var(--line); border-left: 3px solid var(--brass); border-radius: 6px; padding: 10px 12px; font-size: 0.9rem; }
+
+.mine { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: baseline; }
+.mine .big { font-family: var(--display); font-weight: 800; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.mine .big.money { color: var(--brass); }
+.mine .lab { color: var(--muted); font-size: 0.82rem; }
+.mine > div { display: flex; flex-direction: column; gap: 2px; }
+
+/* Cartões de material */
+.mats { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.mat { background: var(--cell); border: 1px solid var(--line); border-radius: 6px; border-top-left-radius: 30px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+.mat-top { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ico { width: 52px; height: 52px; flex: none; object-fit: contain; }
+.mat h3 { font-size: 0.95rem; font-weight: 600; overflow-wrap: anywhere; }
+.mat .reward { font-size: 0.8rem; color: var(--brass); }
+.mat .reward.none { color: var(--muted); }
+.count { display: flex; align-items: baseline; gap: 6px; font-variant-numeric: tabular-nums; }
+.count .have { font-family: var(--display); font-weight: 800; font-size: 2.1rem; line-height: 1; }
+.count .of { color: var(--muted); font-size: 0.9rem; }
+.badge { margin-left: auto; font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.badge.ok { color: var(--accent); font-weight: 700; }
+.bar { height: 5px; background: var(--cell-2); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--brass); transition: width 0.25s; }
+.bar.ok i { background: var(--accent); }
+.add { display: flex; gap: 6px; }
+.add input { flex: 1; min-width: 0; width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; font-variant-numeric: tabular-nums; }
+.add input:disabled, .add button:disabled { opacity: 0.45; cursor: default; }
+.btn { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 5px; padding: 8px 14px; font-weight: 700; white-space: nowrap; }
+.btn.ghost { background: var(--cell-2); color: var(--fg); border: 1px solid var(--line); font-weight: 600; }
+.btn.brass { background: var(--brass); color: #231a07; }
+.btn.small { padding: 5px 10px; font-size: 0.82rem; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.chips { display: flex; gap: 6px; }
+.chips button { flex: 1; background: var(--cell-2); border: 1px solid var(--line); border-radius: 5px; padding: 4px 0; font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chips button:disabled { opacity: 0.45; cursor: default; }
+
+h2 { font-family: var(--display); font-weight: 700; font-size: 1.25rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.log { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.log li { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; min-width: 0; }
+.log img { width: 30px; height: 30px; object-fit: contain; flex: none; }
+.log .what { flex: 1; min-width: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.log .when { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
+.log li.empty { color: var(--muted); border: 0; background: none; padding-left: 0; }
+
+/* Relatório */
+.sum { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.sum > div { padding: 12px 16px; display: flex; flex-direction: column; gap: 2px; border-right: 1px solid var(--line); min-width: 0; }
+.sum > div:last-child { border-right: 0; }
+.sum .big { font-family: var(--display); font-weight: 800; font-size: 1.9rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.sum .big.money { color: var(--brass); }
+.sum .lab { color: var(--muted); font-size: 0.8rem; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 820px; font-variant-numeric: tabular-nums; }
+#roster { min-width: 640px; }
+th, td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); }
+th { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); vertical-align: bottom; }
+th img { display: block; width: 30px; height: 30px; object-fit: contain; margin: 0 0 2px auto; }
+tbody tr:last-child td { border-bottom: 0; }
+td.q { color: var(--muted); }
+td.q.ok { color: var(--accent); font-weight: 700; }
+td.name { font-weight: 600; max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
+td.pay { text-align: right; }
+td.money { color: var(--brass); font-weight: 700; }
+td.left { text-align: left; }
+.paid { color: var(--accent); font-weight: 600; }
+.paid small, .pending { color: var(--muted); font-weight: 400; }
+.adj { color: var(--brass); font-size: 0.78rem; display: block; }
+.gid { color: var(--muted); font-weight: 400; }
+.linkbtn { background: none; border: 0; color: var(--muted); text-decoration: underline; padding: 2px 6px; font-size: 0.8rem; }
+.linkbtn.go { color: var(--accent); font-weight: 700; }
+.linkbtn.warn { color: var(--danger); }
+.copybox { width: 100%; min-height: 140px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; color: var(--fg); font: 0.85rem/1.4 ui-monospace, Menlo, Consolas, monospace; padding: 10px; }
+
+/* Membros */
+.memform { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto; gap: 10px; align-items: end; background: var(--cell); border: 1px solid var(--line); border-radius: 6px; border-top-left-radius: 30px; padding: 14px; }
+.memform .memhead { grid-column: 1 / -1; font-weight: 600; padding-left: 14px; overflow-wrap: anywhere; }
+.memform label { display: flex; flex-direction: column; gap: 4px; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; min-width: 0; }
+.memform input { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; font-size: 0.95rem; text-transform: none; letter-spacing: 0; color: var(--fg); }
+.memform input:disabled { opacity: 0.6; }
+.memactions { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 560px) { .memform { grid-template-columns: minmax(0, 1fr); } }
+
+/* Metas */
+.cfg { display: grid; gap: 8px; }
+.cfg-row { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: center; background: var(--cell); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+.cfg-row img { width: 40px; height: 40px; object-fit: contain; }
+.cfg-row .nm { font-weight: 600; overflow-wrap: anywhere; }
+.cfg-row label { display: flex; flex-direction: column; gap: 2px; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; min-width: 0; }
+.cfg-row input { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 7px 9px; font-size: 0.95rem; text-transform: none; letter-spacing: 0; color: var(--fg); font-variant-numeric: tabular-nums; }
+.cfg-row input:disabled { opacity: 0.6; }
+.hint { color: var(--muted); font-size: 0.85rem; }
+.cfg-main { display: grid; gap: 8px; min-width: 0; }
+.cfg-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.cfg-calc { display: flex; flex-direction: column; gap: 2px; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; min-width: 0; }
+.cfg-calc b { font-family: var(--display); font-weight: 800; font-size: 1.5rem; letter-spacing: 0; color: var(--accent); line-height: 1.3; font-variant-numeric: tabular-nums; text-transform: none; }
+.routes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.routes label { font-weight: 600; }
+.routes input { width: 90px; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 7px 9px; font-variant-numeric: tabular-nums; }
+.routes input:disabled { opacity: 0.6; }
+@media (max-width: 520px) {
+  .cfg-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .weekbar .left { margin-left: 0; width: 100%; }
+}
+
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(20px); background: var(--fg); color: var(--bg); padding: 9px 16px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; max-width: calc(100vw - 32px); text-align: center; }
+.toast.on { opacity: 1; transform: translateX(-50%); }
+@media (prefers-reduced-motion: reduce) { .bar i, .toast { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1><span class="org">BLK</span><span class="app">Metas de Materiais</span></h1>
+      <p class="sub">Registro semanal, relatório e pagamento das metas</p>
+    </div>
+    <div class="who" id="who"></div>
+  </header>
+
+  <section id="screen-load" class="loading">Carregando…</section>
+
+  <section id="screen-login" class="center" hidden>
+    <h2>Entre para registrar seus materiais</h2>
+    <p class="hint">Use a sua conta do Discord. No primeiro acesso, um líder da BLK precisa aprovar você antes de liberar o registro.</p>
+    <button class="btn discord" id="btnLogin" type="button">Entrar com Discord</button>
+    <p class="hint" id="loginErr"></p>
+  </section>
+
+  <div id="screen-main" style="display:grid;gap:18px" hidden>
+    <div class="weekbar" id="weekbar">
+      <button class="nav" id="prevWeek" type="button" aria-label="Semana anterior">&#8592;</button>
+      <div class="lbl"><span class="rng" id="weekRange"></span><span class="tag" id="weekTag"></span></div>
+      <button class="nav" id="nextWeek" type="button" aria-label="Próxima semana">&#8594;</button>
+      <span class="left" id="weekLeft"></span>
+    </div>
+
+    <div class="notice" id="notice" hidden></div>
+
+    <nav class="tabs" role="tablist" aria-label="Seções" id="tabs">
+      <button type="button" role="tab" data-tab="registrar" aria-selected="true">Registrar</button>
+      <button type="button" role="tab" data-tab="relatorio" aria-selected="false">Relatório da semana</button>
+      <button type="button" role="tab" data-tab="membros" aria-selected="false" id="tabMembros">Membros</button>
+      <button type="button" role="tab" data-tab="metas" aria-selected="false">Metas e valores</button>
+    </nav>
+
+    <section id="tab-registrar" style="display:grid;gap:18px">
+      <div class="mine" id="mine"></div>
+      <div class="mats" id="mats"></div>
+      <div>
+        <h2>Meus registros da semana</h2>
+        <ul class="log" id="log"></ul>
+      </div>
+    </section>
+
+    <section id="tab-relatorio" style="display:none;gap:14px" hidden>
+      <div class="sum" id="sum"></div>
+      <div class="toolbar">
+        <p class="hint" id="reportHint"></p>
+        <button class="btn ghost" id="copyReport" type="button">Copiar relatório para o Discord</button>
+      </div>
+      <textarea class="copybox" id="copyBox" readonly hidden aria-label="Texto do relatório"></textarea>
+      <div class="tablewrap"><table id="report"></table></div>
+    </section>
+
+    <section id="tab-membros" style="display:none;gap:14px" hidden>
+      <div>
+        <h2>Membros da BLK</h2>
+        <p class="hint" style="margin-top:6px">Cadastre o nome e o ID do seu personagem. Os líderes usam essa lista para conferir o relatório e fazer o pagamento.</p>
+      </div>
+      <form class="memform" id="memForm">
+        <div class="memhead" id="memTarget"></div>
+        <label for="memNome">Nome no jogo<input id="memNome" maxlength="40" autocomplete="off"></label>
+        <label for="memId">ID no jogo<input id="memId" maxlength="12" inputmode="numeric" autocomplete="off"></label>
+        <div class="memactions">
+          <button class="btn" type="submit" id="memSave">Salvar cadastro</button>
+          <button class="btn ghost" type="button" id="memCancel" hidden>Cancelar edição</button>
+        </div>
+      </form>
+      <div class="tablewrap" id="rosterWrap"><table id="roster"></table></div>
+    </section>
+
+    <section id="tab-metas" style="display:none;gap:14px" hidden>
+      <div>
+        <h2>Metas e valores</h2>
+        <p class="hint" id="cfgHint" style="margin-top:6px"></p>
+      </div>
+      <div class="routes"><label for="cfgRoutes">Rotas por semana</label><input id="cfgRoutes" type="number" min="1" step="1"><span class="hint">Cada rota tem 23 blips. Meta da semana = quantidade por rota x rotas por semana.</span></div>
+      <div class="cfg" id="cfg"></div>
+      <div><button class="btn" id="saveCfg" type="button">Salvar metas</button></div>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  'use strict';
+  var MATS = [
+    { id: 'plastico', name: 'Plástico' },
+    { id: 'massa', name: 'Massa Química' },
+    { id: 'moeda', name: 'Moeda Antiga' },
+    { id: 'ferro', name: 'Ferro Fundido' },
+    { id: 'tecido', name: 'Tecido' },
+    { id: 'borracha', name: 'Borracha Prensada' }
+  ];
+  function icon(id) { return 'icons/' + id + '.png'; }
+
+  var CFG = window.BLK_CONFIG || {};
+  var configured = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && !/COLE_AQUI/.test(CFG.SUPABASE_URL + CFG.SUPABASE_ANON_KEY));
+  var sb = null;
+  if (configured && window.supabase) sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+
+  var S = {
+    userId: null, me: null, membros: [], registros: [], pagamentos: [], cfg: null, totals: {},
+    weekKey: null, curWeek: null, tab: 'registrar', editId: null, confirmRevoke: null, loadErr: null
+  };
+  var cfgDirty = false, memDirty = false, cardsBuilt = false, loading = null, booting = false;
+
+  /* ---------- utilidades ---------- */
+  function $(id) { return document.getElementById(id); }
+  function h(tag, props) {
+    var e = document.createElement(tag);
+    if (props) for (var k in props) {
+      var v = props[k];
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (k.indexOf('on') === 0) e.addEventListener(k.slice(2), v);
+      else if (v === true) e.setAttribute(k, '');
+      else if (v !== false && v != null) e.setAttribute(k, v);
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null || c === false) continue;
+      e.append(c.nodeType ? c : document.createTextNode(c));
+    }
+    return e;
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function parseKey(k) { var p = k.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function keyOf(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function shiftKey(k, w) { var d = parseKey(k); d.setDate(d.getDate() + 7 * w); return keyOf(d); }
+  function dm(d) { return pad(d.getDate()) + '/' + pad(d.getMonth() + 1); }
+  function money(n) { return '$ ' + Math.round(n).toLocaleString('pt-BR'); }
+  function num(n) { return Math.round(n).toLocaleString('pt-BR'); }
+  function isCurrent() { return S.weekKey && S.weekKey === S.curWeek; }
+  var toastTimer;
+  function toast(msg) {
+    var t = $('toast'); t.textContent = msg; t.classList.add('on');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('on'); }, 3000);
+  }
+  function errMsg(e) {
+    var m = (e && e.message) || '';
+    if (/row-level security|permission denied/i.test(m)) return 'Sem permissão para essa ação (ou a semana já fechou).';
+    if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Sem conexão com o servidor. Tente de novo.';
+    return m || 'Algo deu errado. Tente de novo.';
+  }
+  function show(name) {
+    ['load', 'login', 'main'].forEach(function (n) { $('screen-' + n).hidden = n !== name; });
+  }
+
+  /* ---------- papéis e configuração ---------- */
+  function isMember() { return !!S.me && (S.me.papel === 'membro' || S.me.papel === 'lider'); }
+  function isLeader() { return !!S.me && S.me.papel === 'lider'; }
+  function perRoute(id) { var p = S.cfg && S.cfg.por_rota; return Math.max(0, Number(p && p[id]) || 0); }
+  function routesN() { return Math.max(0, Number(S.cfg && S.cfg.rotas) || 0); }
+  function goal(id) { return Math.round(perRoute(id) * routesN()); }
+  function reward(id) { var v = S.cfg && S.cfg.valores; return Math.max(0, Number(v && v[id]) || 0); }
+  function goalCount() { return MATS.filter(function (m) { return goal(m.id) > 0; }).length; }
+  function memberName(m) { return (m && (m.nome || m.discord_nome)) || 'Sem cadastro'; }
+  function byId(id) { return S.membros.filter(function (m) { return m.id === id; })[0] || null; }
+  function computeTotals() {
+    S.totals = {};
+    S.registros.forEach(function (r) {
+      var t = S.totals[r.membro_id] = S.totals[r.membro_id] || {};
+      t[r.material] = (t[r.material] || 0) + r.qtd;
+    });
+  }
+  function calc(uid) {
+    var t = S.totals[uid] || {}, hit = 0, amount = 0, hits = {};
+    MATS.forEach(function (m) {
+      var ok = goal(m.id) > 0 && (t[m.id] || 0) >= goal(m.id);
+      hits[m.id] = ok; if (ok) { hit++; amount += reward(m.id); }
+    });
+    return { t: t, hit: hit, amount: amount, hits: hits };
+  }
+  function payOf(uid) { return S.pagamentos.filter(function (p) { return p.membro_id === uid; })[0] || null; }
+
+  /* ---------- carregar dados ---------- */
+  async function fetchRegistros() {
+    var all = [], from = 0, size = 1000;
+    for (;;) {
+      var r = await sb.from('registros').select('id,membro_id,material,qtd,criado_em')
+        .eq('semana', S.weekKey).order('id', { ascending: false }).range(from, from + size - 1);
+      if (r.error) throw r.error;
+      all = all.concat(r.data || []);
+      if (!r.data || r.data.length < size) break;
+      from += size;
+    }
+    return all;
+  }
+  function loadData(first) {
+    if (loading) return loading;
+    loading = (async function () {
+      try {
+        var r = await sb.from('membros').select('*');
+        if (r.error) throw r.error;
+        S.membros = r.data || [];
+        S.me = byId(S.userId);
+        if (first || !S.curWeek) {
+          var w = await sb.rpc('semana_atual');
+          if (w.error) throw w.error;
+          S.curWeek = w.data; if (!S.weekKey) S.weekKey = w.data;
+        }
+        if (isMember()) {
+          var res = await Promise.all([
+            fetchRegistros(),
+            sb.from('pagamentos').select('*').eq('semana', S.weekKey),
+            sb.from('config').select('*').eq('id', 1).maybeSingle()
+          ]);
+          if (res[1].error) throw res[1].error;
+          if (res[2].error) throw res[2].error;
+          S.registros = res[0]; S.pagamentos = res[1].data || []; S.cfg = res[2].data || null;
+        } else { S.registros = []; S.pagamentos = []; S.cfg = null; }
+        computeTotals(); S.loadErr = null;
+      } catch (e) { S.loadErr = errMsg(e); }
+      loading = null;
+      renderAll();
+    })();
+    return loading;
+  }
+
+  /* ---------- cabeçalho, semana, aviso ---------- */
+  function renderWho() {
+    var w = $('who'); w.textContent = '';
+    if (!S.userId || !S.me) return;
+    var chip = S.me.papel === 'lider' ? h('span', { class: 'chip lead', text: 'Líder' })
+      : S.me.papel === 'membro' ? h('span', { class: 'chip', text: 'Membro' })
+      : h('span', { class: 'chip wait', text: 'Aguardando aprovação' });
+    if (S.me.avatar_url) w.append(h('img', { src: S.me.avatar_url, alt: '' }));
+    w.append(h('span', { class: 'nm', text: memberName(S.me) }), chip,
+      h('button', { class: 'btn ghost small', type: 'button', id: 'btnLogout', text: 'Sair' }));
+  }
+  function renderWeek() {
+    $('weekbar').hidden = !isMember();
+    if (!S.weekKey) return;
+    var s = parseKey(S.weekKey), e = new Date(s); e.setDate(e.getDate() + 6);
+    $('weekRange').textContent = dm(s) + ' a ' + dm(e);
+    $('weekTag').textContent = isCurrent() ? 'Semana atual' : (S.weekKey < S.curWeek ? 'Semana encerrada' : '');
+    $('nextWeek').disabled = S.weekKey >= S.curWeek;
+    tickLeft();
+  }
+  function tickLeft() {
+    var el = $('weekLeft');
+    if (!isCurrent()) { el.textContent = ''; return; }
+    var p = shiftKey(S.curWeek, 1).split('-');
+    var end = Date.UTC(+p[0], +p[1] - 1, +p[2], 3, 0, 0) - Date.now();
+    if (end < 0) { el.textContent = 'Semana encerrada, atualize a página'; return; }
+    var d = Math.floor(end / 864e5), hh = Math.floor((end % 864e5) / 36e5), mm = Math.floor((end % 36e5) / 6e4);
+    el.textContent = 'Fecha em ' + (d > 0 ? d + 'd ' : '') + hh + 'h ' + pad(mm) + 'min (segunda 00:00, Brasília)';
+  }
+  function renderNotice() {
+    var msg = '';
+    if (S.loadErr) msg = 'Não foi possível carregar os dados: ' + S.loadErr;
+    else if (!S.me) msg = 'Seu perfil ainda não existe no banco. Saia e entre de novo; se continuar, avise um líder.';
+    else if (S.me.papel === 'pendente') msg = 'Seu acesso está aguardando aprovação de um líder da BLK. Enquanto espera, cadastre seu nome e ID na aba Membros.';
+    else if (!S.me.nome) msg = 'Cadastre seu nome e ID na aba Membros para aparecer no relatório com o seu nome.';
+    else if (S.cfg && S.cfg.exemplo) msg = 'O número de rotas por semana e os valores são de exemplo. Um líder deve confirmar na aba Metas e valores antes de pagar.';
+    var n = $('notice'); n.hidden = !msg; n.textContent = msg;
+  }
+
+  /* ---------- aba Registrar ---------- */
+  function buildCards() {
+    if (cardsBuilt) return; cardsBuilt = true;
+    var box = $('mats');
+    MATS.forEach(function (m) {
+      var input = h('input', { type: 'number', inputmode: 'numeric', min: '1', step: '1', id: 'in-' + m.id, placeholder: 'Quantidade', 'aria-label': 'Quantidade de ' + m.name });
+      var chips = h('div', { class: 'chips' });
+      [10, 50, 100].forEach(function (q) { chips.append(h('button', { type: 'button', 'data-q': q, 'data-for': m.id, text: '+' + q })); });
+      var form = h('form', { class: 'add', 'data-m': m.id }, input, h('button', { class: 'btn', type: 'submit', text: 'Adicionar' }));
+      box.append(h('article', { class: 'mat', id: 'mat-' + m.id },
+        h('div', { class: 'mat-top' },
+          h('img', { class: 'ico', src: icon(m.id), alt: '' }),
+          h('div', { style: 'min-width:0' }, h('h3', { text: m.name }), h('div', { class: 'reward', id: 'rw-' + m.id }))),
+        h('div', { class: 'count' }, h('span', { class: 'have', id: 'hv-' + m.id, text: '0' }), h('span', { class: 'of', id: 'of-' + m.id }), h('span', { class: 'badge', id: 'bd-' + m.id })),
+        h('div', { class: 'bar', id: 'br-' + m.id }, h('i')),
+        form, chips));
+    });
+    box.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button[data-q]'); if (!b || b.disabled) return;
+      var inp = $('in-' + b.getAttribute('data-for'));
+      inp.value = (parseInt(inp.value, 10) || 0) + parseInt(b.getAttribute('data-q'), 10);
+      inp.focus();
+    });
+    box.addEventListener('submit', async function (ev) {
+      ev.preventDefault();
+      var f = ev.target, mid = f.getAttribute('data-m'), inp = $('in-' + mid);
+      var q = parseInt(inp.value, 10);
+      if (!(q > 0) || q > 100000) { toast('Digite uma quantidade entre 1 e 100.000.'); return; }
+      var btn = f.querySelector('button[type=submit]'); btn.disabled = true;
+      var r = await sb.from('registros').insert({ material: mid, qtd: q });
+      if (r.error) { btn.disabled = false; toast(errMsg(r.error)); return; }
+      inp.value = '';
+      toast('+' + num(q) + ' ' + MATS.filter(function (x) { return x.id === mid; })[0].name + ' registrado');
+      await loadData(false);
+    });
+  }
+  function renderRegistrar() {
+    var can = isMember() && isCurrent();
+    var c = S.me ? calc(S.userId) : { t: {}, hit: 0, amount: 0 };
+    MATS.forEach(function (m) {
+      var have = c.t[m.id] || 0, g = goal(m.id), ok = g > 0 && have >= g;
+      $('hv-' + m.id).textContent = num(have);
+      $('of-' + m.id).textContent = g > 0 ? '/ ' + num(g) : '';
+      var bd = $('bd-' + m.id), br = $('br-' + m.id);
+      bd.className = 'badge' + (ok ? ' ok' : '');
+      bd.textContent = g <= 0 ? 'sem meta' : ok ? 'Meta batida' : 'faltam ' + num(g - have);
+      br.className = 'bar' + (ok ? ' ok' : '');
+      br.firstChild.style.width = (g > 0 ? Math.min(100, have / g * 100) : 0) + '%';
+      var rw = $('rw-' + m.id), r = reward(m.id);
+      rw.className = 'reward' + (r > 0 ? '' : ' none');
+      rw.textContent = r > 0 ? 'Paga ' + money(r) + ' na meta' : 'Sem valor definido';
+      $('in-' + m.id).disabled = !can;
+    });
+    document.querySelectorAll('#mats button').forEach(function (b) { b.disabled = !can; });
+    var mine = $('mine'); mine.textContent = '';
+    var pay = S.me ? payOf(S.userId) : null;
+    mine.append(
+      h('div', null, h('span', { class: 'big', text: c.hit + '/' + goalCount() }), h('span', { class: 'lab', text: 'metas batidas' })),
+      h('div', null, h('span', { class: 'big money', text: money(c.amount) }), h('span', { class: 'lab', text: pay ? 'pago em ' + dm(new Date(pay.pago_em)) + ' (' + money(pay.valor) + ')' : 'a receber nesta semana' })));
+    var log = $('log'); log.textContent = '';
+    var items = S.registros.filter(function (x) { return x.membro_id === S.userId; });
+    if (!items.length) { log.append(h('li', { class: 'empty', text: 'Nenhum registro seu nesta semana.' })); return; }
+    items.forEach(function (x) {
+      var mm = MATS.filter(function (m) { return m.id === x.material; })[0] || { name: x.material };
+      var li = h('li', null,
+        h('img', { src: icon(x.material), alt: '' }),
+        h('span', { class: 'what', text: '+' + num(x.qtd) + ' ' + mm.name }),
+        h('span', { class: 'when', text: new Date(x.criado_em).toLocaleString('pt-BR', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) }));
+      if (can) li.append(h('button', { class: 'btn ghost small', type: 'button', 'data-undo': x.id, text: 'Desfazer' }));
+      log.append(li);
+    });
+  }
+
+  /* ---------- aba Relatório ---------- */
+  function reportRows() {
+    return S.membros.filter(function (m) { return m.papel !== 'pendente'; }).map(function (m) {
+      return { id: m.id, name: memberName(m) + (m.id === S.userId ? ' (você)' : ''), gid: m.game_id || '', c: calc(m.id), pay: payOf(m.id) };
+    }).sort(function (a, b) { return (b.c.amount - a.c.amount) || a.name.localeCompare(b.name, 'pt-BR'); });
+  }
+  function renderReport() {
+    var rows = reportRows(), total = goalCount(), leader = isLeader();
+    var pending = 0, paid = 0, full = 0;
+    rows.forEach(function (r) {
+      if (r.pay) paid += r.pay.valor; else pending += r.c.amount;
+      if (total > 0 && r.c.hit === total) full++;
+    });
+    var sum = $('sum'); sum.textContent = '';
+    [['Pendente de pagamento', money(pending), true], ['Já pago', money(paid), true], ['Membros', String(rows.length), false], ['Com todas as metas', full + ' de ' + rows.length, false]].forEach(function (x) {
+      sum.append(h('div', null, h('span', { class: 'big' + (x[2] ? ' money' : ''), text: x[1] }), h('span', { class: 'lab', text: x[0] })));
+    });
+    var t = $('report'); t.textContent = '';
+    var hr = h('tr', null, h('th', { text: 'Membro' }));
+    MATS.forEach(function (m) { hr.append(h('th', { title: m.name }, h('img', { src: icon(m.id), alt: '' }), m.name + (goal(m.id) > 0 ? ' · ' + num(goal(m.id)) : ''))); });
+    hr.append(h('th', { text: 'Metas' }), h('th', { text: 'A pagar' }), h('th', { text: 'Pagamento' }));
+    t.append(h('thead', null, hr));
+    var tb = h('tbody');
+    if (!rows.length) tb.append(h('tr', null, h('td', { colspan: String(MATS.length + 4), class: 'left', style: 'color:var(--muted);padding:18px', text: 'Nenhum membro cadastrado ainda.' })));
+    rows.forEach(function (r) {
+      var tr = h('tr', null, h('td', { class: 'name' }, r.name, r.gid ? h('small', { class: 'gid', text: ' #' + r.gid }) : null));
+      MATS.forEach(function (m) { tr.append(h('td', { class: 'q' + (r.c.hits[m.id] ? ' ok' : ''), text: num(r.c.t[m.id] || 0) })); });
+      tr.append(h('td', { text: r.c.hit + '/' + total }), h('td', { class: 'money', text: money(r.c.amount) }));
+      var td = h('td', { class: 'pay' });
+      if (r.pay) {
+        td.append(h('span', { class: 'paid' }, 'Pago ' + money(r.pay.valor) + ' ', h('small', { text: dm(new Date(r.pay.pago_em)) })));
+        if (r.c.amount > r.pay.valor) td.append(h('span', { class: 'adj', text: 'faltam ' + money(r.c.amount - r.pay.valor) + ' por novas metas' }));
+        if (leader) td.append(h('button', { class: 'linkbtn', type: 'button', 'data-unpay': r.id, text: 'Desfazer' }));
+      } else if (r.c.amount > 0) {
+        td.append(leader ? h('button', { class: 'btn brass small', type: 'button', 'data-pay': r.id, 'data-amount': r.c.amount, text: 'Marcar como pago' }) : h('span', { class: 'pending', text: 'Pendente' }));
+      } else td.append(h('span', { class: 'pending', text: 'Sem meta batida' }));
+      tr.append(td); tb.append(tr);
+    });
+    t.append(tb);
+    $('reportHint').textContent = leader ? 'Confira os valores, pague no jogo e marque como pago aqui.' : 'Somente líderes marcam pagamentos.';
+  }
+  function reportText() {
+    var s = parseKey(S.weekKey), e = new Date(s); e.setDate(e.getDate() + 6);
+    var rows = reportRows(), total = goalCount(), lines = ['**BLK · Relatório semanal ' + dm(s) + ' a ' + dm(e) + '**', ''];
+    var pend = 0, paid = 0;
+    rows.forEach(function (r) {
+      if (r.pay) paid += r.pay.valor; else pend += r.c.amount;
+      var st = r.pay ? 'PAGO' : r.c.amount > 0 ? 'PENDENTE' : 'sem meta';
+      lines.push(r.name.replace(' (você)', '') + (r.gid ? ' (ID ' + r.gid + ')' : '') + ': ' + r.c.hit + '/' + total + ' metas, ' + money(r.c.amount) + ' (' + st + ')');
+    });
+    lines.push('', 'Pendente: ' + money(pend) + ' | Pago: ' + money(paid));
+    return lines.join('\n');
+  }
+
+  /* ---------- aba Membros ---------- */
+  function targetId() { return S.editId || S.userId; }
+  function loadForm(force) {
+    if (memDirty && !force) return;
+    var m = byId(targetId()) || {};
+    $('memNome').value = m.nome || '';
+    $('memId').value = m.game_id || '';
+  }
+  function papelChip(p) {
+    return p === 'lider' ? h('span', { class: 'chip lead', text: 'Líder' }) : p === 'membro' ? h('span', { class: 'chip', text: 'Membro' }) : h('span', { class: 'chip wait', text: 'Pendente' });
+  }
+  function renderMembers() {
+    var editing = !!S.editId && S.editId !== S.userId, can = !!S.me;
+    $('memTarget').textContent = editing ? 'Editando o cadastro de ' + memberName(byId(S.editId)) : 'Seu cadastro';
+    $('memNome').disabled = !can; $('memId').disabled = !can; $('memSave').disabled = !can;
+    $('memCancel').hidden = !editing;
+    loadForm(false);
+    $('rosterWrap').hidden = !isMember();
+    var pendCount = isLeader() ? S.membros.filter(function (m) { return m.papel === 'pendente'; }).length : 0;
+    $('tabMembros').textContent = pendCount ? 'Membros (' + pendCount + ' novo' + (pendCount > 1 ? 's' : '') + ')' : 'Membros';
+    var tb = $('roster'); tb.textContent = '';
+    if (!isMember()) return;
+    var hr = h('tr', null, h('th', { text: 'Nome' }), h('th', { text: 'ID' }), h('th', { text: 'Discord' }), h('th', { text: 'Acesso' }), h('th', { text: 'Metas da semana' }));
+    if (isLeader()) hr.append(h('th', { text: 'Ações' }));
+    tb.append(h('thead', null, hr));
+    var list = S.membros.slice().sort(function (a, b) {
+      var pa = a.papel === 'pendente' ? 0 : 1, pb = b.papel === 'pendente' ? 0 : 1;
+      return (pa - pb) || memberName(a).localeCompare(memberName(b), 'pt-BR');
+    });
+    var body = h('tbody');
+    list.forEach(function (m) {
+      var tr = h('tr', null,
+        h('td', { class: 'name', text: memberName(m) + (m.id === S.userId ? ' (você)' : '') }),
+        h('td', { text: m.game_id || '—' }),
+        h('td', { class: 'q', text: m.discord_nome || '—' }),
+        h('td', null, papelChip(m.papel)),
+        h('td', { text: m.papel === 'pendente' ? '—' : calc(m.id).hit + '/' + goalCount() }));
+      if (isLeader()) {
+        var td = h('td', { class: 'pay' });
+        if (m.papel === 'pendente') td.append(h('button', { class: 'linkbtn go', type: 'button', 'data-papel': 'membro', 'data-id': m.id, text: 'Aprovar' }));
+        td.append(h('button', { class: 'linkbtn', type: 'button', 'data-edit': m.id, text: 'Editar' }));
+        if (m.papel === 'membro') td.append(h('button', { class: 'linkbtn', type: 'button', 'data-papel': 'lider', 'data-id': m.id, text: 'Tornar líder' }));
+        if (m.papel === 'lider' && m.id !== S.userId) td.append(h('button', { class: 'linkbtn', type: 'button', 'data-papel': 'membro', 'data-id': m.id, text: 'Tirar liderança' }));
+        if (m.papel !== 'pendente' && m.id !== S.userId) {
+          td.append(S.confirmRevoke === m.id
+            ? h('button', { class: 'linkbtn warn', type: 'button', 'data-papel': 'pendente', 'data-id': m.id, text: 'Confirmar revogação' })
+            : h('button', { class: 'linkbtn', type: 'button', 'data-ask': m.id, text: 'Revogar acesso' }));
+        }
+        tr.append(td);
+      }
+      body.append(tr);
+    });
+    tb.append(body);
+  }
+
+  /* ---------- aba Metas ---------- */
+  function updateCalc() {
+    var r = Math.max(0, Math.round(Number($('cfgRoutes').value) || 0));
+    MATS.forEach(function (m) {
+      var el = $('cm-' + m.id), pi = $('cp-' + m.id);
+      if (el && pi) el.textContent = num(Math.max(0, Math.round(Number(pi.value) || 0)) * r);
+    });
+  }
+  function renderCfg(force) {
+    if (cfgDirty && !force) return;
+    var leader = isLeader(), box = $('cfg'); box.textContent = '';
+    $('cfgRoutes').value = routesN() ? String(routesN()) : '';
+    $('cfgRoutes').disabled = !leader;
+    MATS.forEach(function (m) {
+      var pi = h('input', { type: 'number', min: '0', step: '1', id: 'cp-' + m.id, value: String(perRoute(m.id)), disabled: !leader });
+      var ri = h('input', { type: 'number', min: '0', step: '1', id: 'cr-' + m.id, value: String(reward(m.id)), disabled: !leader });
+      [pi, ri].forEach(function (i) { i.addEventListener('input', function () { cfgDirty = true; updateCalc(); }); });
+      box.append(h('div', { class: 'cfg-row' },
+        h('img', { src: icon(m.id), alt: '' }),
+        h('div', { class: 'cfg-main' },
+          h('span', { class: 'nm', text: m.name }),
+          h('div', { class: 'cfg-fields' },
+            h('label', { for: 'cp-' + m.id }, 'Por rota', pi),
+            h('div', { class: 'cfg-calc' }, h('span', { text: 'Meta da semana' }), h('b', { id: 'cm-' + m.id, text: num(goal(m.id)) })),
+            h('label', { for: 'cr-' + m.id }, 'Valor da meta ($)', ri)))));
+    });
+    $('saveCfg').disabled = !leader;
+    $('cfgHint').textContent = leader
+      ? 'Informe quanto cada material rende em uma rota de 23 blips e quantas rotas por semana cada membro deve fazer. O valor é pago a cada membro que bater a meta daquele material. Por rota 0 desativa o material.'
+      : 'Somente líderes alteram metas e valores. A meta é o rendimento de uma rota de 23 blips vezes as rotas da semana.';
+  }
+
+  /* ---------- geral ---------- */
+  function setTab(t) {
+    S.tab = t;
+    document.querySelectorAll('#tabs button').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === t)); });
+    ['registrar', 'relatorio', 'membros', 'metas'].forEach(function (x) {
+      var el = $('tab-' + x), on = x === t; el.hidden = !on; el.style.display = on ? 'grid' : 'none';
+    });
+  }
+  function renderAll() {
+    if (!S.userId) return;
+    renderWho(); renderNotice();
+    var pend = !!S.me && S.me.papel === 'pendente' || !S.me;
+    document.querySelectorAll('#tabs button').forEach(function (b) { b.hidden = pend && b.getAttribute('data-tab') !== 'membros'; });
+    if (pend && S.tab !== 'membros') setTab('membros');
+    renderWeek(); renderRegistrar(); renderReport(); renderMembers(); renderCfg(false);
+  }
+
+  async function boot() {
+    if (booting) return; booting = true;
+    try {
+      if (!sb) {
+        show('login'); $('btnLogin').disabled = true;
+        $('loginErr').textContent = configured ? 'Não foi possível carregar o Supabase. Confira sua conexão.' : 'Falta configurar o Supabase. Edite o arquivo config.js (veja o README).';
+        return;
+      }
+      var s = await sb.auth.getSession();
+      var session = s.data && s.data.session;
+      if (!session) { show('login'); return; }
+      S.userId = session.user.id;
+      buildCards();
+      await loadData(true);
+      show('main');
+      if (!isMember()) setTab('membros'); else setTab(S.tab);
+      renderAll();
+    } finally { booting = false; }
+  }
+
+  function bind() {
+    $('btnLogin').addEventListener('click', async function () {
+      var r = await sb.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin + window.location.pathname } });
+      if (r.error) $('loginErr').textContent = errMsg(r.error);
+    });
+    $('who').addEventListener('click', async function (e) {
+      if (!e.target.closest('#btnLogout')) return;
+      await sb.auth.signOut(); S.userId = null; S.me = null; show('login'); renderWho();
+    });
+    $('tabs').addEventListener('click', function (e) { var b = e.target.closest('button[data-tab]'); if (b) setTab(b.getAttribute('data-tab')); });
+    $('prevWeek').addEventListener('click', function () { S.weekKey = shiftKey(S.weekKey, -1); loadData(false); });
+    $('nextWeek').addEventListener('click', function () { if (S.weekKey < S.curWeek) { S.weekKey = shiftKey(S.weekKey, 1); loadData(false); } });
+
+    $('log').addEventListener('click', async function (e) {
+      var b = e.target.closest('button[data-undo]'); if (!b) return;
+      b.disabled = true;
+      var r = await sb.from('registros').delete().eq('id', Number(b.getAttribute('data-undo'))).select();
+      if (r.error || !r.data || !r.data.length) { b.disabled = false; toast(r.error ? errMsg(r.error) : 'Não foi possível desfazer (a semana pode ter fechado).'); return; }
+      toast('Registro desfeito'); loadData(false);
+    });
+
+    $('report').addEventListener('click', async function (e) {
+      var p = e.target.closest('button[data-pay]'), u = e.target.closest('button[data-unpay]');
+      if (p) {
+        p.disabled = true;
+        var r = await sb.from('pagamentos').insert({ semana: S.weekKey, membro_id: p.getAttribute('data-pay'), valor: Number(p.getAttribute('data-amount')) });
+        if (r.error) { p.disabled = false; toast(r.error.code === '23505' ? 'Esse pagamento já estava marcado.' : errMsg(r.error)); }
+        else toast('Pagamento marcado');
+        loadData(false);
+      }
+      if (u) {
+        u.disabled = true;
+        var d = await sb.from('pagamentos').delete().eq('semana', S.weekKey).eq('membro_id', u.getAttribute('data-unpay')).select();
+        if (d.error) { u.disabled = false; toast(errMsg(d.error)); } else toast('Pagamento desfeito');
+        loadData(false);
+      }
+    });
+    $('copyReport').addEventListener('click', function () {
+      var txt = reportText(), box = $('copyBox');
+      function fallback() { box.hidden = false; box.value = txt; box.focus(); box.select(); toast('Selecione e copie o texto abaixo'); }
+      try { navigator.clipboard.writeText(txt).then(function () { toast('Relatório copiado'); }, fallback); } catch (er) { fallback(); }
+    });
+
+    $('memNome').addEventListener('input', function () { memDirty = true; });
+    $('memId').addEventListener('input', function () { memDirty = true; });
+    $('memCancel').addEventListener('click', function () { S.editId = null; memDirty = false; loadForm(true); renderMembers(); });
+    $('memForm').addEventListener('submit', async function (ev) {
+      ev.preventDefault();
+      var tg = targetId(); if (!tg) return;
+      var b = $('memSave'); b.disabled = true;
+      var r = await sb.rpc('salvar_cadastro', { p_alvo: tg, p_nome: $('memNome').value, p_game_id: $('memId').value });
+      b.disabled = false;
+      if (r.error) { toast(errMsg(r.error)); return; }
+      memDirty = false; S.editId = null; toast('Cadastro salvo');
+      await loadData(false); loadForm(true);
+    });
+    $('roster').addEventListener('click', async function (e) {
+      var ed = e.target.closest('button[data-edit]'), ask = e.target.closest('button[data-ask]'), pp = e.target.closest('button[data-papel]');
+      if (ed) { S.editId = ed.getAttribute('data-edit'); memDirty = false; S.confirmRevoke = null; loadForm(true); renderMembers(); $('memNome').focus(); }
+      if (ask) { S.confirmRevoke = ask.getAttribute('data-ask'); renderMembers(); }
+      if (pp) {
+        pp.disabled = true; S.confirmRevoke = null;
+        var r = await sb.rpc('definir_papel', { p_alvo: pp.getAttribute('data-id'), p_papel: pp.getAttribute('data-papel') });
+        if (r.error) { pp.disabled = false; toast(errMsg(r.error)); return; }
+        toast('Acesso atualizado'); loadData(false);
+      }
+    });
+
+    $('cfgRoutes').addEventListener('input', function () { cfgDirty = true; updateCalc(); });
+    $('saveCfg').addEventListener('click', async function () {
+      if (!isLeader()) return;
+      var routes = Math.max(1, Math.round(Number($('cfgRoutes').value) || 0));
+      var per = {}, vals = {};
+      MATS.forEach(function (m) {
+        per[m.id] = Math.max(0, Math.round(Number($('cp-' + m.id).value) || 0));
+        vals[m.id] = Math.max(0, Math.round(Number($('cr-' + m.id).value) || 0));
+      });
+      var b = $('saveCfg'); b.disabled = true;
+      var r = await sb.from('config').upsert({ id: 1, rotas: routes, blips: 23, por_rota: per, valores: vals, exemplo: false, atualizado_em: new Date().toISOString() });
+      b.disabled = false;
+      if (r.error) { toast(errMsg(r.error)); return; }
+      cfgDirty = false; toast('Metas salvas'); await loadData(false); renderCfg(true);
+    });
+  }
+
+  bind();
+  setInterval(tickLeft, 30000);
+  setInterval(function () { if (S.userId && !document.hidden && !loading) loadData(false); }, 60000);
+  document.addEventListener('visibilitychange', function () { if (S.userId && !document.hidden) loadData(false); });
+  if (sb) sb.auth.onAuthStateChange(function (evt) {
+    if (evt === 'SIGNED_OUT') { S.userId = null; show('login'); }
+    else if (evt === 'SIGNED_IN' && !S.userId) boot();
+  });
+  boot();
+})();
+</script>
+</body>
+</html>
